@@ -1,0 +1,137 @@
+{
+  "name": "Pragya Pandey",
+  "contact": {
+    "email": "pragyapandey2709@gmail.com",
+    "phone": "91 6263203173",
+    "linkedin": "https://linkedin.com/in/pragya-pandey-775339208",
+    "github": "https://github.com/Pragya-Pandey2709",
+    "website": null,
+    "portfolio": null,
+    "location": "Hyderabad, Telangana",
+    "full_address": null
+  },
+  "summary": null,
+  "education": [
+    "Amity School of Engineering And Technology Noida , India\nBachelor of Engineering Technology, Minor in Business Analytics - 9.25 CGPA Sep 2020 - June 2024"
+  ],
+  "experience": [
+    "ASSOCIATE ML ENGINEER Aug 2024 - Current\nClarivate Noida,UP\n• Working in the development team to build an ML based application utilizing AWS Services, LLMs and Generative AI within\nthe Intellectual Property domain\nDATA ANALYTICS INTERN Feb 2024 - Aug 2024\nSkillsify Digital Marketing Remote\n• Implemented and deployed a customer segmentation model with clustering algorithms and Python, enhancing targeted\nmarketing strategies, 20% growth in engagement\nAI/ML RESEARCH INTERN Feb 2024 - June 2024\nDRDO, RCI Hyderabad, Telangana\n• Calibrated 500+ Inertial Measurement Units using deep learning, improving accuracy by 40 percent.\n• Designed and applied advanced algorithms to enhance IMU performance, reducing error rates by 35 percent.\nAI/ML RESEARCH INTERN May 2023 - Aug 2023\nTECH MAHINDRA Noida,UP\n• Analyzed 10,000+ cyber incidents to uncover fraud patterns and enhance criminal profiling techniques.\n• AI-based cyber security model for IPS and IDS. Increased threat detection rates by 30% using data modeling, TensorFlow,\nand Keras."
+  ],
+  "projects": [
+    "ColNet: A Compact Convolutional Transformer for Colon Cancer Prediction\n• Built ColNet, a Compact Convolutional Transformer framework, achieving 99.93% accuracy in automated colon cancer\nprediction from 10,000 endoscopy images. Runner-up at Technovate 2024; research paper presented at Amity University.\nML Pipeline for Multi-Grade Classification in Pancreatic Cancer Detection by Urinary BM\n• Awarded Best Paper in Intelligent Systems at the 2nd Congress on Control, Robotics, and Mechatronics (CRM2024),\nachieving significant advancements in pancreatic cancer detection.\n• Published in SCOPUS Indexed Springer Book Series: Smart Innovation, Systems, and Technologies.\nEarly Detection of Diabetic Retinopathy using Capsule Networks and Image Processing Techniques\n• The optimization of the utilization of 110,000 eye images allowed for effective network retraining over 20 epochs with an\naccuracy rate of 95%.\n• An average precision-recall score of 0.95 and a 10% decrease in false negatives.\nInsightAI - A smart IoT and ML-based device model to aid visually impaired people\n• Boosted user independence by 40% using Raspberry Pi and TensorFlow.Improved navigation safety with real-time object\ndetection and voice assistance using OpenCV and Google Text-to-Speech API.\nLeadership Roles served\nPresident, Amity Artificial Intelligence Club Sept 2023 - June 2024\nAmity University Noida,UP\nCore Team Member, Google Student Developer Club Jan 2022 - June 2024\nAmity University Noida,UP"
+  ],
+  "skills_raw": [
+    "Languages: Java",
+    "Python",
+    "C/C++",
+    "SQL",
+    "JavaScript",
+    "HTML/CSS",
+    "R\nDeveloper Tools: Git",
+    "Docker",
+    "Google Cloud Platform",
+    "VS Code",
+    "Visual Studio",
+    "PyCharm",
+    "IntelliJ",
+    "Eclipse\nLibraries: pandas",
+    "NumPy",
+    "Matplotlib",
+    "TensorFlow",
+    "PyTorch",
+    "Scikit-learn",
+    "Keras",
+    "NLTK"
+  ],
+  "skills_categorized": {
+    "languages": [
+      "Languages: Java",
+      "Python",
+      "C/C++",
+      "SQL",
+      "JavaScript",
+      "HTML/CSS",
+      "R\nDeveloper Tools: Git",
+      "Docker",
+      "Google Cloud Platform",
+      "VS Code",
+      "PyCharm",
+      "Eclipse\nLibraries: pandas",
+      "TensorFlow",
+      "PyTorch",
+      "Scikit-learn",
+      "Keras"
+    ],
+    "tools": [
+      "R\nDeveloper Tools: Git",
+      "Docker",
+      "VS Code",
+      "Visual Studio",
+      "PyCharm",
+      "IntelliJ",
+      "Eclipse\nLibraries: pandas"
+    ],
+    "frameworks": [
+      "Eclipse\nLibraries: pandas",
+      "NumPy",
+      "Matplotlib",
+      "TensorFlow",
+      "PyTorch",
+      "Scikit-learn",
+      "Keras",
+      "NLTK"
+    ],
+    "technologies": [
+      "HTML/CSS"
+    ],
+    "databases": [],
+    "cloud": [
+      "Google Cloud Platform"
+    ],
+    "soft_skills": [],
+    "other": []
+  },
+  "achievements": [],
+  "awards": [],
+  "certifications": [
+    "Feb 2024: ”Python for Data Science” NPTEL course - Gold medal\nNov 2022: Intro to Tensor Flow for Deep Learning, Udemy\nAug 2022: Google Data Analytics Professional Certificate\nJun 2022: Big Data with Hadoop Effervescence, IIIT Allahabad\nCouncil of Scientific and Industrial Research, Smart India and Kavach Hackathon: Participated and won in\nvarious hackathons, paper presentations, and competitions"
+  ],
+  "publications": [],
+  "languages": [],
+  "volunteering": [],
+  "interests": [],
+  "confidence_score": 90.0,
+  "warnings": [],
+  "detected_sections": [
+    {
+      "type": "experience",
+      "heading": "Experience",
+      "confidence": 100,
+      "preview": "ASSOCIATE ML ENGINEER Aug 2024 - Current\nClarivate Noida,UP\n• Working in the development team to bui..."
+    },
+    {
+      "type": "projects",
+      "heading": "Projects",
+      "confidence": 100,
+      "preview": "ColNet: A Compact Convolutional Transformer for Colon Cancer Prediction\n• Built ColNet, a Compact Co..."
+    },
+    {
+      "type": "education",
+      "heading": "Education",
+      "confidence": 100,
+      "preview": "Amity School of Engineering And Technology Noida , India\nBachelor of Engineering Technology, Minor i..."
+    },
+    {
+      "type": "certifications",
+      "heading": "Certifications and Training",
+      "confidence": 100,
+      "preview": "Feb 2024: ”Python for Data Science” NPTEL course - Gold medal\nNov 2022: Intro to Tensor Flow for Dee..."
+    },
+    {
+      "type": "skills",
+      "heading": "Technical Skills",
+      "confidence": 100,
+      "preview": "Languages: Java, Python, C/C++, SQL, JavaScript, HTML/CSS, R\nDeveloper Tools: Git, Docker, Google Cl..."
+    }
+  ]
+}

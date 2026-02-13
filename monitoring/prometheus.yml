@@ -1,0 +1,118 @@
+# =============================================================================
+# HR RESUME ASSISTANT - PROMETHEUS CONFIGURATION
+# =============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'hr-resume-monitor'
+
+# =============================================================================
+# ALERTING
+# =============================================================================
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+          # - alertmanager:9093
+
+# =============================================================================
+# RULE FILES
+# =============================================================================
+rule_files:
+  # - "alert_rules.yml"
+
+# =============================================================================
+# SCRAPE CONFIGS
+# =============================================================================
+scrape_configs:
+  # =========================================================================
+  # PROMETHEUS SELF-MONITORING
+  # =========================================================================
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          environment: 'production'
+
+  # =========================================================================
+  # BACKEND API METRICS
+  # =========================================================================
+  - job_name: 'hr-resume-backend'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['backend:8000']
+        labels:
+          service: 'backend'
+          environment: 'production'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '(.*):\d+'
+        replacement: '${1}'
+
+  # =========================================================================
+  # FRONTEND METRICS (if exposed)
+  # =========================================================================
+  - job_name: 'hr-resume-frontend'
+    metrics_path: '/api/metrics'
+    static_configs:
+      - targets: ['frontend:3000']
+        labels:
+          service: 'frontend'
+          environment: 'production'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # =========================================================================
+  # POSTGRESQL METRICS
+  # =========================================================================
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+          environment: 'production'
+
+  # =========================================================================
+  # REDIS METRICS
+  # =========================================================================
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
+          environment: 'production'
+
+  # =========================================================================
+  # NGINX METRICS
+  # =========================================================================
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+        labels:
+          service: 'nginx'
+          environment: 'production'
+
+  # =========================================================================
+  # NODE EXPORTER (Host Metrics)
+  # =========================================================================
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node'
+          environment: 'production'
+
+  # =========================================================================
+  # DOCKER METRICS
+  # =========================================================================
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'docker'
+          environment: 'production'

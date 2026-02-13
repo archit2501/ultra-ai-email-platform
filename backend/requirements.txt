@@ -1,0 +1,65 @@
+# FastAPI & ASGI Server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy[asyncio]==2.0.25  # Async support
+alembic==1.13.1
+psycopg2-binary==2.9.9  # Sync driver (keep for compatibility)
+asyncpg==0.29.0  # Async PostgreSQL driver (high-performance C implementation)
+aiosqlite==0.19.0  # Async SQLite driver (for local development)
+greenlet==3.0.3  # Required for SQLAlchemy async
+
+# Validation & Settings
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0.post1
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.1.2
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Web Scraping
+beautifulsoup4==4.12.2
+lxml==4.9.4
+
+# Data Processing
+pandas==2.1.4
+openpyxl==3.1.2
+
+# Email
+jinja2==3.1.3
+
+# HTML Sanitization
+bleach==6.1.0
+
+# Utilities
+python-dotenv==1.0.0
+
+# Rate Limiting
+slowapi==0.1.9
+
+# Background Tasks
+apscheduler==3.10.4
+arq==0.25.0  # Async task queue for Redis (Phase 3)
+
+# Caching
+redis==5.0.1  # Sync Redis client
+redis[hiredis]==5.0.1  # With C parser
+aioredis==2.0.1  # Async Redis client (deprecated but stable)
+# Note: redis>=5.0 has built-in async support via redis.asyncio
+
+# Performance Monitoring
+py-cpuinfo==9.0.0
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+fakeredis==2.21.1  # For testing without real Redis

@@ -1,0 +1,1372 @@
+# =============================================================================
+# HR RESUME ASSISTANT - MASTER DEPLOYMENT CONFIGURATION
+# =============================================================================
+# Version: 2.0.0
+# Last Updated: 2024-01-26
+#
+# This file contains the complete deployment configuration for:
+# - Docker Compose (Development & Production)
+# - Kubernetes Deployment (Production)
+# - Environment Configuration
+# - Security Settings
+# - Monitoring & Logging
+#
+# SECURITY NOTE: Replace all placeholders marked with <PLACEHOLDER> before deployment
+# =============================================================================
+
+# =============================================================================
+# DEPLOYMENT CHECKLIST
+# =============================================================================
+# Before deploying, ensure you have:
+# [ ] Replaced all <PLACEHOLDER> values with actual secrets
+# [ ] Generated a strong SECRET_KEY (min 64 characters)
+# [ ] Set up SSL certificates
+# [ ] Configured DNS records
+# [ ] Set up monitoring (Prometheus/Grafana)
+# [ ] Configured backup strategy for PostgreSQL
+# [ ] Set up log aggregation
+# [ ] Tested health endpoints
+# [ ] Reviewed security settings
+# =============================================================================
+
+---
+# =============================================================================
+# SECTION 1: ENVIRONMENT VARIABLES TEMPLATE
+# =============================================================================
+# Copy this to .env.production and fill in actual values
+# =============================================================================
+
+env_template: |
+  # ===========================================
+  # APPLICATION SETTINGS
+  # ===========================================
+  PROJECT_NAME=HR Resume Assistant
+  ENVIRONMENT=production
+  DEBUG=False
+  LOG_LEVEL=INFO
+
+  # API Configuration
+  API_V1_PREFIX=/api/v1
+  CORS_ORIGINS=https://<YOUR_DOMAIN>,https://www.<YOUR_DOMAIN>
+
+  # ===========================================
+  # SECURITY SETTINGS (CRITICAL)
+  # ===========================================
+  # Generate with: openssl rand -hex 64
+  SECRET_KEY=<GENERATE_64_CHAR_SECRET_KEY>
+  ALGORITHM=HS256
+  ACCESS_TOKEN_EXPIRE_MINUTES=30
+  REFRESH_TOKEN_EXPIRE_DAYS=7
+
+  # Password Policy
+  MIN_PASSWORD_LENGTH=12
+  REQUIRE_SPECIAL_CHARS=True
+  REQUIRE_NUMBERS=True
+  REQUIRE_UPPERCASE=True
+
+  # ===========================================
+  # DATABASE SETTINGS
+  # ===========================================
+  POSTGRES_SERVER=<DATABASE_HOST_OR_IP>
+  POSTGRES_PORT=5432
+  POSTGRES_USER=<DATABASE_USER>
+  POSTGRES_PASSWORD=<STRONG_DATABASE_PASSWORD>
+  POSTGRES_DB=hr_resume_production
+
+  # Connection Pool Settings
+  DB_POOL_SIZE=20
+  DB_MAX_OVERFLOW=10
+  DB_POOL_TIMEOUT=30
+  DB_POOL_RECYCLE=1800
+
+  # ===========================================
+  # REDIS SETTINGS
+  # ===========================================
+  REDIS_ENABLED=True
+  REDIS_URL=redis://<REDIS_HOST>:6379/0
+  REDIS_PASSWORD=<REDIS_PASSWORD>
+  REDIS_SSL=True
+  REDIS_CACHE_TTL_DEFAULT=3600
+  REDIS_CACHE_TTL_SHORT=300
+  REDIS_CACHE_TTL_LONG=86400
+
+  # ===========================================
+  # EMAIL SETTINGS (SMTP)
+  # ===========================================
+  SMTP_HOST=smtp.gmail.com
+  SMTP_PORT=587
+  SMTP_USE_TLS=True
+  SMTP_TIMEOUT=30
+
+  # Primary Email Account
+  PRAGYA_EMAIL=<PRIMARY_EMAIL>
+  PRAGYA_PASSWORD=<APP_SPECIFIC_PASSWORD>
+  PRAGYA_RESUME_PATH=resumes/default_resume.pdf
+
+  # Secondary Email Account (Optional)
+  ANIRUDDH_EMAIL=<SECONDARY_EMAIL>
+  ANIRUDDH_PASSWORD=<APP_SPECIFIC_PASSWORD>
+  ANIRUDDH_RESUME_PATH=resumes/secondary_resume.pdf
+
+  # ===========================================
+  # AI SERVICES
+  # ===========================================
+  ANTHROPIC_API_KEY=<ANTHROPIC_API_KEY>
+  OPENAI_API_KEY=<OPENAI_API_KEY>
+
+  # ===========================================
+  # DATA ENRICHMENT APIs (ULTRA DEEP)
+  # ===========================================
+  HUNTER_API_KEY=<HUNTER_IO_API_KEY>
+  APOLLO_API_KEY=<APOLLO_IO_API_KEY>
+  CLEARBIT_API_KEY=<CLEARBIT_API_KEY>
+  SNOV_CLIENT_ID=<SNOV_IO_CLIENT_ID>
+  SNOV_CLIENT_SECRET=<SNOV_IO_CLIENT_SECRET>
+  BUILTWITH_API_KEY=<BUILTWITH_API_KEY>
+  ROCKETREACH_API_KEY=<ROCKETREACH_API_KEY>
+  PROXYCURL_API_KEY=<PROXYCURL_API_KEY>
+
+  # ===========================================
+  # FILE STORAGE
+  # ===========================================
+  STORAGE_BASE_PATH=/app/storage
+  EXPORTS_DIR=/app/exports
+  MAX_FILE_SIZE_MB=25
+  MAX_STORAGE_QUOTA_MB=500
+
+  # ===========================================
+  # RATE LIMITING
+  # ===========================================
+  RATE_LIMIT_REQUESTS_PER_MINUTE=100
+  RATE_LIMIT_BURST=20
+  LOGIN_RATE_LIMIT=5/minute
+  REGISTRATION_RATE_LIMIT=3/minute
+  API_READ_RATE_LIMIT=100/minute
+  API_WRITE_RATE_LIMIT=30/minute
+
+  # ===========================================
+  # MONITORING & OBSERVABILITY
+  # ===========================================
+  SENTRY_DSN=<SENTRY_DSN_URL>
+  PROMETHEUS_ENABLED=True
+  PROMETHEUS_PORT=9090
+
+  # ===========================================
+  # SSL/TLS SETTINGS
+  # ===========================================
+  SSL_CERT_PATH=/etc/ssl/certs/fullchain.pem
+  SSL_KEY_PATH=/etc/ssl/private/privkey.pem
+
+---
+# =============================================================================
+# SECTION 2: DOCKER COMPOSE - PRODUCTION
+# =============================================================================
+version: '3.9'
+
+services:
+  # ===========================================================================
+  # BACKEND API SERVICE
+  # ===========================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - BUILD_ENV=production
+    image: hr-resume-backend:${VERSION:-latest}
+    container_name: hr-resume-backend
+    restart: unless-stopped
+
+    # Security settings
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/logs
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Environment
+    env_file:
+      - .env.production
+    environment:
+      - TZ=UTC
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+
+    # Volumes
+    volumes:
+      - backend_storage:/app/storage:rw
+      - backend_exports:/app/exports:rw
+      - backend_logs:/app/logs:rw
+      - ./backend/alembic:/app/alembic:ro
+
+    # Networking
+    ports:
+      - "8000:8000"
+    networks:
+      - hr-resume-network
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Dependencies
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+        labels: "service,environment"
+        env: "ENVIRONMENT"
+
+  # ===========================================================================
+  # FRONTEND SERVICE
+  # ===========================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://<YOUR_DOMAIN>/api/v1
+        - BUILD_ENV=production
+    image: hr-resume-frontend:${VERSION:-latest}
+    container_name: hr-resume-frontend
+    restart: unless-stopped
+
+    # Security settings
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+    # Environment
+    environment:
+      - NODE_ENV=production
+      - TZ=UTC
+
+    # Networking
+    ports:
+      - "3000:3000"
+    networks:
+      - hr-resume-network
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    # Dependencies
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ===========================================================================
+  # POSTGRESQL DATABASE
+  # ===========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: hr-resume-postgres
+    restart: unless-stopped
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Environment
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hr_resume_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-hr_resume_production}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      # Performance tuning
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+
+    # Volumes
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+      - ./database/backup:/backup
+
+    # Networking
+    ports:
+      - "5432:5432"
+    networks:
+      - hr-resume-network
+
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hr_resume_user} -d ${POSTGRES_DB:-hr_resume_production}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+    # PostgreSQL configuration
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=128MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_connections=200
+      -c log_statement=mod
+      -c log_duration=on
+      -c log_min_duration_statement=1000
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ===========================================================================
+  # REDIS CACHE
+  # ===========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: hr-resume-redis
+    restart: unless-stopped
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+    # Volumes
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+
+    # Command with security
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+
+    # Networking
+    ports:
+      - "6379:6379"
+    networks:
+      - hr-resume-network
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ===========================================================================
+  # NGINX REVERSE PROXY & SSL TERMINATION
+  # ===========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: hr-resume-nginx
+    restart: unless-stopped
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+    # Volumes
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./ssl/certs:/etc/ssl/certs:ro
+      - ./ssl/private:/etc/ssl/private:ro
+      - nginx_logs:/var/log/nginx
+
+    # Networking
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - hr-resume-network
+
+    # Dependencies
+    depends_on:
+      - backend
+      - frontend
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ===========================================================================
+  # PROMETHEUS MONITORING
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hr-resume-prometheus
+    restart: unless-stopped
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+    user: "65534:65534"
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+    # Volumes
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+    # Command
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+
+    # Networking
+    ports:
+      - "9090:9090"
+    networks:
+      - hr-resume-network
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ===========================================================================
+  # GRAFANA DASHBOARDS
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hr-resume-grafana
+    restart: unless-stopped
+
+    # Security
+    security_opt:
+      - no-new-privileges:true
+    user: "472:472"
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+    # Environment
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=https://<YOUR_DOMAIN>/grafana
+
+    # Volumes
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+
+    # Networking
+    ports:
+      - "3001:3000"
+    networks:
+      - hr-resume-network
+
+    # Dependencies
+    depends_on:
+      - prometheus
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+# ===========================================================================
+# NETWORKS
+# ===========================================================================
+networks:
+  hr-resume-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# ===========================================================================
+# VOLUMES
+# ===========================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_storage:
+    driver: local
+  backend_exports:
+    driver: local
+  backend_logs:
+    driver: local
+  nginx_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+---
+# =============================================================================
+# SECTION 3: KUBERNETES DEPLOYMENT
+# =============================================================================
+
+# ===========================================================================
+# NAMESPACE
+# ===========================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hr-resume
+  labels:
+    app.kubernetes.io/name: hr-resume
+    app.kubernetes.io/managed-by: kubectl
+
+---
+# ===========================================================================
+# SECRETS
+# ===========================================================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hr-resume-secrets
+  namespace: hr-resume
+type: Opaque
+stringData:
+  # Database
+  POSTGRES_USER: "<DATABASE_USER>"
+  POSTGRES_PASSWORD: "<STRONG_DATABASE_PASSWORD>"
+
+  # Redis
+  REDIS_PASSWORD: "<REDIS_PASSWORD>"
+
+  # Security
+  SECRET_KEY: "<GENERATE_64_CHAR_SECRET_KEY>"
+
+  # Email
+  PRAGYA_EMAIL: "<PRIMARY_EMAIL>"
+  PRAGYA_PASSWORD: "<APP_SPECIFIC_PASSWORD>"
+
+  # AI Services
+  ANTHROPIC_API_KEY: "<ANTHROPIC_API_KEY>"
+  OPENAI_API_KEY: "<OPENAI_API_KEY>"
+
+  # Data Enrichment APIs
+  HUNTER_API_KEY: "<HUNTER_IO_API_KEY>"
+  APOLLO_API_KEY: "<APOLLO_IO_API_KEY>"
+  CLEARBIT_API_KEY: "<CLEARBIT_API_KEY>"
+  SNOV_CLIENT_ID: "<SNOV_IO_CLIENT_ID>"
+  SNOV_CLIENT_SECRET: "<SNOV_IO_CLIENT_SECRET>"
+  BUILTWITH_API_KEY: "<BUILTWITH_API_KEY>"
+
+---
+# ===========================================================================
+# CONFIGMAP
+# ===========================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hr-resume-config
+  namespace: hr-resume
+data:
+  PROJECT_NAME: "HR Resume Assistant"
+  ENVIRONMENT: "production"
+  DEBUG: "False"
+  LOG_LEVEL: "INFO"
+  API_V1_PREFIX: "/api/v1"
+  CORS_ORIGINS: "https://<YOUR_DOMAIN>"
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  POSTGRES_SERVER: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "hr_resume_production"
+  REDIS_ENABLED: "True"
+  REDIS_URL: "redis://redis-service:6379/0"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "587"
+  SMTP_USE_TLS: "True"
+  STORAGE_BASE_PATH: "/app/storage"
+  EXPORTS_DIR: "/app/exports"
+  MAX_FILE_SIZE_MB: "25"
+
+---
+# ===========================================================================
+# BACKEND DEPLOYMENT
+# ===========================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: hr-resume
+  labels:
+    app: backend
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: hr-resume-sa
+
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+      # Anti-affinity for HA
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: backend
+                topologyKey: kubernetes.io/hostname
+
+      containers:
+        - name: backend
+          image: <REGISTRY>/hr-resume-backend:${VERSION:-latest}
+          imagePullPolicy: Always
+
+          # Security
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          # Ports
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+              name: http
+
+          # Environment
+          envFrom:
+            - configMapRef:
+                name: hr-resume-config
+            - secretRef:
+                name: hr-resume-secrets
+
+          # Resources
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+
+          # Probes
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 30
+
+          # Volume mounts
+          volumeMounts:
+            - name: storage
+              mountPath: /app/storage
+            - name: exports
+              mountPath: /app/exports
+            - name: tmp
+              mountPath: /tmp
+            - name: logs
+              mountPath: /app/logs
+
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: backend-storage-pvc
+        - name: exports
+          persistentVolumeClaim:
+            claimName: backend-exports-pvc
+        - name: tmp
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+
+---
+# ===========================================================================
+# BACKEND SERVICE
+# ===========================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: hr-resume
+  labels:
+    app: backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: backend
+
+---
+# ===========================================================================
+# FRONTEND DEPLOYMENT
+# ===========================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: hr-resume
+  labels:
+    app: frontend
+    version: v1
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        version: v1
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+
+      containers:
+        - name: frontend
+          image: <REGISTRY>/hr-resume-frontend:${VERSION:-latest}
+          imagePullPolicy: Always
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+              name: http
+
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://<YOUR_DOMAIN>/api/v1"
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /app/.next/cache
+
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+
+---
+# ===========================================================================
+# FRONTEND SERVICE
+# ===========================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: hr-resume
+  labels:
+    app: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: frontend
+
+---
+# ===========================================================================
+# POSTGRESQL STATEFULSET
+# ===========================================================================
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: hr-resume
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      securityContext:
+        fsGroup: 999
+
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+
+          ports:
+            - containerPort: 5432
+              name: postgres
+
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: hr-resume-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hr-resume-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: hr-resume-config
+                  key: POSTGRES_DB
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 20Gi
+
+---
+# ===========================================================================
+# POSTGRES SERVICE
+# ===========================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: hr-resume
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres
+
+---
+# ===========================================================================
+# REDIS DEPLOYMENT
+# ===========================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: hr-resume
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        fsGroup: 999
+
+      containers:
+        - name: redis
+          image: redis:7-alpine
+
+          command:
+            - redis-server
+            - --requirepass
+            - $(REDIS_PASSWORD)
+            - --maxmemory
+            - 256mb
+            - --maxmemory-policy
+            - allkeys-lru
+            - --appendonly
+            - "yes"
+
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hr-resume-secrets
+                  key: REDIS_PASSWORD
+
+          ports:
+            - containerPort: 6379
+              name: redis
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - -a
+                - $(REDIS_PASSWORD)
+                - ping
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - -a
+                - $(REDIS_PASSWORD)
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+
+      volumes:
+        - name: redis-data
+          emptyDir: {}
+
+---
+# ===========================================================================
+# REDIS SERVICE
+# ===========================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: hr-resume
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: redis
+
+---
+# ===========================================================================
+# INGRESS (NGINX INGRESS CONTROLLER)
+# ===========================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hr-resume-ingress
+  namespace: hr-resume
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+spec:
+  tls:
+    - hosts:
+        - <YOUR_DOMAIN>
+      secretName: hr-resume-tls
+  rules:
+    - host: <YOUR_DOMAIN>
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 3000
+
+---
+# ===========================================================================
+# HORIZONTAL POD AUTOSCALER - BACKEND
+# ===========================================================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: hr-resume
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+# ===========================================================================
+# NETWORK POLICY - RESTRICT TRAFFIC
+# ===========================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-network-policy
+  namespace: hr-resume
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+        - podSelector:
+            matchLabels:
+              app: nginx-ingress
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow external API calls
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 587
+
+---
+# ===========================================================================
+# POD DISRUPTION BUDGET
+# ===========================================================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  namespace: hr-resume
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: backend
+
+---
+# ===========================================================================
+# SERVICE ACCOUNT
+# ===========================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hr-resume-sa
+  namespace: hr-resume
+
+---
+# ===========================================================================
+# PERSISTENT VOLUME CLAIMS
+# ===========================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-storage-pvc
+  namespace: hr-resume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-exports-pvc
+  namespace: hr-resume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi

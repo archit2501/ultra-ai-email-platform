@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deep Auth Flow Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #0a0a0a;
+            color: #0f0;
+        }
+        .section {
+            background: #1a1a1a;
+            border: 2px solid #0f0;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            margin: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        button:hover { background: #0a0; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .warning { color: #ff0; }
+        .info { color: #0af; }
+        input {
+            width: 300px;
+            padding: 10px;
+            margin: 5px;
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+        }
+        #log {
+            background: #000;
+            padding: 15px;
+            border: 1px solid #0f0;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+        }
+        h1 { color: #0f0; text-shadow: 0 0 10px #0f0; }
+        h2 { color: #0af; border-bottom: 2px solid #0af; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>⚡ DEEP AUTHENTICATION FLOW TESTER ⚡</h1>
+
+    <div class="section">
+        <h2>🔐 Step 1: Test Backend API</h2>
+        <button onclick="testBackend()">Test Backend Health</button>
+        <button onclick="testAdminLogin()">Test Admin Login (API)</button>
+        <button onclick="testPragyaLogin()">Test Pragya Login (API)</button>
+    </div>
+
+    <div class="section">
+        <h2>🎯 Step 2: Test Full Login Flow</h2>
+        <input type="text" id="username" placeholder="Username" value="admin">
+        <input type="password" id="password" placeholder="Password" value="admin123"><br>
+        <button onclick="testFullLoginFlow()">🚀 Test Complete Login Flow</button>
+        <button onclick="clearStorage()">🗑️ Clear All Storage</button>
+    </div>
+
+    <div class="section">
+        <h2>💾 Step 3: Test Storage</h2>
+        <button onclick="checkStorage()">Check LocalStorage</button>
+        <button onclick="testZustandPersist()">Test Zustand Persist</button>
+    </div>
+
+    <div class="section">
+        <h2>🔍 Step 4: Verify State</h2>
+        <button onclick="testGetMe()">Test /auth/me Endpoint</button>
+        <button onclick="simulateDashboardLoad()">Simulate Dashboard Load</button>
+    </div>
+
+    <div class="section">
+        <h2>📊 Console Output</h2>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api/v1';
+        let globalToken = null;
+
+        function log(msg, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                success: 'success',
+                error: 'error',
+                warning: 'warning',
+                info: 'info'
+            };
+            const elem = document.getElementById('log');
+            elem.innerHTML += `<div class="${colors[type]}">[${timestamp}] ${msg}</div>`;
+            elem.scrollTop = elem.scrollHeight;
+            console.log(msg);
+        }
+
+        async function testBackend() {
+            document.getElementById('log').innerHTML = '';
+            log('🏥 Testing backend health...', 'info');
+
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('✅ Backend is HEALTHY: ' + JSON.stringify(data), 'success');
+                    return true;
+                } else {
+                    log('❌ Backend returned error: ' + response.status, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log('❌ Cannot connect to backend: ' + error.message, 'error');
+                log('⚠️  Make sure backend is running on http://localhost:8000', 'warning');
+                return false;
+            }
+        }
+
+        async function testAdminLogin() {
+            log('\n🔑 Testing admin login...', 'info');
+            await loginAPI('admin', 'admin123');
+        }
+
+        async function testPragyaLogin() {
+            log('\n🔑 Testing pragya login...', 'info');
+            await loginAPI('pragya', 'pragya123');
+        }
+
+        async function loginAPI(username, password) {
+            try {
+                log(`📡 POST ${API_URL}/auth/login/json`, 'info');
+                log(`   Body: {"username":"${username}","password":"${password}"}`, 'info');
+
+                const response = await fetch(`${API_URL}/auth/login/json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                log(`📊 Response: ${response.status} ${response.statusText}`, 'info');
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('✅ LOGIN SUCCESS!', 'success');
+                    log(`🎟️  Token: ${data.access_token.substring(0, 60)}...`, 'success');
+                    globalToken = data.access_token;
+                    localStorage.setItem('token', globalToken);
+                    log('💾 Token saved to localStorage', 'success');
+                    return data;
+                } else {
+                    log('❌ LOGIN FAILED: ' + JSON.stringify(data), 'error');
+                    return null;
+                }
+            } catch (error) {
+                log('❌ Network error: ' + error.message, 'error');
+                return null;
+            }
+        }
+
+        async function testFullLoginFlow() {
+            document.getElementById('log').innerHTML = '';
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            log('🚀 STARTING COMPLETE LOGIN FLOW TEST', 'success');
+            log('=' .repeat(60), 'info');
+
+            // Step 1: Backend health
+            log('\n📍 STEP 1: Backend Health Check', 'info');
+            const backendOk = await testBackend();
+            if (!backendOk) {
+                log('⛔ Cannot proceed - backend is down', 'error');
+                return;
+            }
+
+            // Step 2: Clear storage
+            log('\n📍 STEP 2: Clear Previous Auth Data', 'info');
+            localStorage.clear();
+            log('✅ Storage cleared', 'success');
+
+            // Step 3: Login
+            log('\n📍 STEP 3: Attempt Login', 'info');
+            const loginData = await loginAPI(username, password);
+            if (!loginData) {
+                log('⛔ Login failed - cannot proceed', 'error');
+                return;
+            }
+
+            // Step 4: Get user data
+            log('\n📍 STEP 4: Fetch User Data (/auth/me)', 'info');
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${globalToken}` }
+                });
+
+                const userData = await response.json();
+
+                if (response.ok) {
+                    log('✅ User data received:', 'success');
+                    log(JSON.stringify(userData, null, 2), 'success');
+
+                    // Step 5: Simulate zustand store
+                    log('\n📍 STEP 5: Simulate Auth Store Update', 'info');
+                    const authState = {
+                        token: globalToken,
+                        user: userData
+                    };
+                    localStorage.setItem('auth-storage', JSON.stringify({ state: authState }));
+                    log('✅ Auth state saved to localStorage (zustand format)', 'success');
+
+                    // Step 6: Verify storage
+                    log('\n📍 STEP 6: Verify Storage', 'info');
+                    const storedToken = localStorage.getItem('token');
+                    const storedAuthState = localStorage.getItem('auth-storage');
+
+                    log('Token in localStorage: ' + (storedToken ? '✅ EXISTS' : '❌ MISSING'),
+                        storedToken ? 'success' : 'error');
+                    log('Auth state in localStorage: ' + (storedAuthState ? '✅ EXISTS' : '❌ MISSING'),
+                        storedAuthState ? 'success' : 'error');
+
+                    if (storedAuthState) {
+                        try {
+                            const parsed = JSON.parse(storedAuthState);
+                            log('Auth state content:', 'info');
+                            log(JSON.stringify(parsed, null, 2), 'info');
+                        } catch (e) {
+                            log('⚠️  Could not parse auth state: ' + e.message, 'warning');
+                        }
+                    }
+
+                    // Final verdict
+                    log('\n' + '='.repeat(60), 'success');
+                    log('🎉 LOGIN FLOW COMPLETED SUCCESSFULLY!', 'success');
+                    log('✅ Token obtained and stored', 'success');
+                    log('✅ User data fetched', 'success');
+                    log('✅ Auth state persisted', 'success');
+                    log('\n👉 Now try refreshing the frontend at http://localhost:3000/login', 'info');
+                    log('   and check if it redirects to dashboard', 'info');
+
+                } else {
+                    log('❌ Failed to get user data: ' + JSON.stringify(userData), 'error');
+                }
+            } catch (error) {
+                log('❌ Error fetching user data: ' + error.message, 'error');
+            }
+        }
+
+        function checkStorage() {
+            log('\n💾 CHECKING LOCALSTORAGE', 'info');
+            log('Total items: ' + localStorage.length, 'info');
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                log(`\n[${i}] Key: "${key}"`, 'info');
+
+                try {
+                    const parsed = JSON.parse(value);
+                    log('   Value (parsed):', 'info');
+                    log('   ' + JSON.stringify(parsed, null, 2).replace(/\n/g, '\n   '), 'info');
+                } catch (e) {
+                    log('   Value (raw): ' + value.substring(0, 100) + (value.length > 100 ? '...' : ''), 'info');
+                }
+            }
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            log('🗑️  All localStorage cleared', 'warning');
+        }
+
+        function testZustandPersist() {
+            log('\n🔍 TESTING ZUSTAND PERSIST FORMAT', 'info');
+
+            const mockState = {
+                state: {
+                    token: 'test-token-123',
+                    user: {
+                        id: 1,
+                        username: 'test',
+                        email: 'test@test.com',
+                        full_name: 'Test User',
+                        role: 'test_role'
+                    }
+                },
+                version: 0
+            };
+
+            localStorage.setItem('auth-storage', JSON.stringify(mockState));
+            log('✅ Mock zustand state saved', 'success');
+
+            const retrieved = localStorage.getItem('auth-storage');
+            const parsed = JSON.parse(retrieved);
+
+            log('Retrieved state:', 'info');
+            log(JSON.stringify(parsed, null, 2), 'info');
+        }
+
+        async function testGetMe() {
+            log('\n👤 TESTING /auth/me ENDPOINT', 'info');
+
+            const token = localStorage.getItem('token') || globalToken;
+            if (!token) {
+                log('❌ No token found - please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('✅ User profile retrieved successfully:', 'success');
+                    log(JSON.stringify(data, null, 2), 'success');
+                } else {
+                    log('❌ Failed to get user profile: ' + JSON.stringify(data), 'error');
+                }
+            } catch (error) {
+                log('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        function simulateDashboardLoad() {
+            log('\n🏠 SIMULATING DASHBOARD LOAD', 'info');
+
+            const authStorage = localStorage.getItem('auth-storage');
+
+            if (!authStorage) {
+                log('❌ No auth-storage found - would redirect to /login', 'error');
+                log('👉 This is why you see the redirect loop!', 'warning');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(authStorage);
+                const token = parsed.state?.token;
+
+                if (token) {
+                    log('✅ Token found in auth-storage:', 'success');
+                    log('   ' + token.substring(0, 50) + '...', 'success');
+                    log('✅ Dashboard would load successfully', 'success');
+                } else {
+                    log('❌ Auth storage exists but no token inside', 'error');
+                    log('   Storage content:', 'error');
+                    log(JSON.stringify(parsed, null, 2), 'error');
+                }
+            } catch (e) {
+                log('❌ Failed to parse auth-storage: ' + e.message, 'error');
+            }
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            log('🚀 Deep Auth Flow Tester Ready', 'success');
+            log('Backend URL: ' + API_URL, 'info');
+            log('=' .repeat(60), 'info');
+            log('👉 Click "Test Complete Login Flow" to begin comprehensive test\n', 'info');
+        });
+    </script>
+</body>
+</html>

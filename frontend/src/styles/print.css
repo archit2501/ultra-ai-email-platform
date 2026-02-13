@@ -1,0 +1,574 @@
+/* ========================================
+   PRINT STYLES - PDF EXPORT OPTIMIZATION
+   ======================================== */
+
+@media print {
+  /* ========================================
+     GLOBAL PRINT STYLES
+     ======================================== */
+
+  *,
+  *::before,
+  *::after {
+    /* Disable animations and transitions for print */
+    animation: none !important;
+    transition: none !important;
+
+    /* Improve text rendering */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  html, body {
+    /* Reset margins for clean printing */
+    margin: 0;
+    padding: 0;
+
+    /* Optimize for A4 size */
+    width: 210mm;
+    height: 297mm;
+
+    /* Ensure white background */
+    background: white !important;
+    color: black !important;
+
+    /* Better font rendering */
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* ========================================
+     HIDE UI ELEMENTS
+     ======================================== */
+
+  /* Hide navigation and UI chrome */
+  nav,
+  aside,
+  header,
+  footer,
+  .sidebar,
+  .no-print,
+  button:not(.print-visible),
+  [role="navigation"],
+  [role="banner"],
+  [role="contentinfo"] {
+    display: none !important;
+  }
+
+  /* Hide interactive elements */
+  .hover\:bg-,
+  .hover\:text-,
+  [data-dropdown],
+  [data-tooltip],
+  [data-popover] {
+    display: none !important;
+  }
+
+  /* ========================================
+     PAGE BREAKS
+     ======================================== */
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  table, figure, img {
+    page-break-inside: avoid;
+  }
+
+  ul, ol {
+    page-break-before: avoid;
+  }
+
+  tr, td, th {
+    page-break-inside: avoid;
+  }
+
+  /* Prevent widows and orphans */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* ========================================
+     CONTENT OPTIMIZATION
+     ======================================== */
+
+  /* Main content area */
+  main,
+  .print-content,
+  .printable {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20mm !important;
+    max-width: none !important;
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 24pt;
+    margin-bottom: 12pt;
+  }
+
+  h2 {
+    font-size: 20pt;
+    margin-top: 18pt;
+    margin-bottom: 10pt;
+  }
+
+  h3 {
+    font-size: 16pt;
+    margin-top: 14pt;
+    margin-bottom: 8pt;
+  }
+
+  h4, h5, h6 {
+    font-size: 14pt;
+    margin-top: 10pt;
+    margin-bottom: 6pt;
+  }
+
+  p {
+    margin-bottom: 8pt;
+  }
+
+  /* Lists */
+  ul, ol {
+    margin-left: 20pt;
+    margin-bottom: 10pt;
+  }
+
+  li {
+    margin-bottom: 4pt;
+  }
+
+  /* ========================================
+     LINKS
+     ======================================== */
+
+  a {
+    text-decoration: underline;
+    color: #000 !important;
+  }
+
+  /* Show URLs after links (optional) */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    color: #666;
+  }
+
+  /* Don't show URLs for navigation links */
+  nav a:after,
+  [role="navigation"] a:after {
+    content: "";
+  }
+
+  /* ========================================
+     TABLES
+     ======================================== */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12pt;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tbody tr {
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 6pt 8pt;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  th {
+    background: #f5f5f5 !important;
+    font-weight: bold;
+  }
+
+  /* ========================================
+     IMAGES & MEDIA
+     ======================================== */
+
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+
+  /* Hide background images (they slow down printing) */
+  * {
+    background-image: none !important;
+  }
+
+  /* Keep specific print-friendly images */
+  .print-image,
+  img[data-print="true"] {
+    display: block;
+    max-width: 170mm;
+    margin: 10pt auto;
+  }
+
+  /* ========================================
+     CARDS & CONTAINERS
+     ======================================== */
+
+  .card,
+  [class*="card"] {
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    margin-bottom: 10pt;
+    padding: 10pt;
+    background: white !important;
+  }
+
+  /* ========================================
+     BADGES & LABELS
+     ======================================== */
+
+  .badge,
+  [class*="badge"] {
+    border: 1px solid #999;
+    padding: 2pt 6pt;
+    border-radius: 3pt;
+    font-size: 9pt;
+    display: inline-block;
+  }
+
+  /* ========================================
+     CHARTS & VISUALIZATIONS
+     ======================================== */
+
+  /* SVG charts */
+  svg {
+    max-width: 170mm !important;
+    height: auto !important;
+  }
+
+  /* Canvas charts - try to preserve */
+  canvas {
+    max-width: 170mm !important;
+    height: auto !important;
+  }
+
+  /* Hide chart tooltips and interactive elements */
+  [class*="tooltip"],
+  [class*="popover"],
+  [class*="dropdown"] {
+    display: none !important;
+  }
+
+  /* ========================================
+     FORMS & INPUTS
+     ======================================== */
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea,
+  select {
+    border: 1px solid #999;
+    padding: 2pt 4pt;
+  }
+
+  /* Hide form buttons except submit */
+  button:not([type="submit"]),
+  input[type="button"],
+  input[type="reset"] {
+    display: none !important;
+  }
+
+  /* ========================================
+     GRID & LAYOUT
+     ======================================== */
+
+  /* Flatten grid layouts for print */
+  [class*="grid"],
+  [class*="flex"] {
+    display: block !important;
+  }
+
+  [class*="grid"] > *,
+  [class*="flex"] > * {
+    width: 100% !important;
+    margin-bottom: 10pt;
+  }
+
+  /* ========================================
+     SPECIFIC COMPONENTS
+     ======================================== */
+
+  /* Sidebar */
+  .sidebar {
+    display: none !important;
+  }
+
+  /* Modals and overlays */
+  [role="dialog"],
+  .modal,
+  .overlay,
+  .backdrop {
+    display: none !important;
+  }
+
+  /* Toast notifications */
+  [class*="toast"],
+  [class*="notification"] {
+    display: none !important;
+  }
+
+  /* Loading spinners */
+  [class*="spinner"],
+  [class*="loading"] {
+    display: none !important;
+  }
+
+  /* ========================================
+     PRINT-SPECIFIC UTILITIES
+     ======================================== */
+
+  /* Show only in print */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Hide in print */
+  .screen-only {
+    display: none !important;
+  }
+
+  /* Page break utilities */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .page-break-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* ========================================
+     HEADER & FOOTER FOR PRINT
+     ======================================== */
+
+  @page {
+    /* Set page margins */
+    margin: 20mm;
+
+    /* Add page numbers */
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 10pt;
+      color: #666;
+    }
+  }
+
+  /* First page without page number */
+  @page :first {
+    @bottom-right {
+      content: "";
+    }
+  }
+
+  /* ========================================
+     METAMINDS BRANDING FOR PRINT
+     ======================================== */
+
+  .print-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10pt;
+    margin-bottom: 15pt;
+    border-bottom: 2pt solid #000;
+  }
+
+  .print-logo {
+    width: 40pt;
+    height: 40pt;
+  }
+
+  .print-title {
+    font-size: 20pt;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .print-footer {
+    display: block !important;
+    margin-top: 20pt;
+    padding-top: 10pt;
+    border-top: 1pt solid #ddd;
+    font-size: 9pt;
+    color: #666;
+    text-align: center;
+  }
+
+  /* ========================================
+     QR CODE & BARCODE
+     ======================================== */
+
+  .print-qr,
+  .print-barcode {
+    max-width: 30mm;
+    max-height: 30mm;
+    display: block;
+    margin: 10pt auto;
+  }
+
+  /* ========================================
+     RESUME/CV SPECIFIC
+     ======================================== */
+
+  .resume-header {
+    text-align: center;
+    margin-bottom: 15pt;
+    page-break-after: avoid;
+  }
+
+  .resume-section {
+    margin-bottom: 15pt;
+    page-break-inside: avoid;
+  }
+
+  .resume-section h2 {
+    border-bottom: 2pt solid #000;
+    padding-bottom: 4pt;
+  }
+
+  /* ========================================
+     APPLICATION/DOCUMENT SPECIFIC
+     ======================================== */
+
+  .document-metadata {
+    font-size: 10pt;
+    color: #666;
+    margin-bottom: 15pt;
+    padding: 8pt;
+    border: 1px solid #ddd;
+    background: #f9f9f9 !important;
+  }
+
+  .document-signature {
+    margin-top: 30pt;
+    padding-top: 15pt;
+    border-top: 1pt solid #000;
+  }
+
+  /* ========================================
+     EMAIL/LETTER FORMAT
+     ======================================== */
+
+  .letter-header {
+    margin-bottom: 20pt;
+  }
+
+  .letter-date {
+    text-align: right;
+    margin-bottom: 15pt;
+  }
+
+  .letter-address {
+    margin-bottom: 15pt;
+  }
+
+  .letter-salutation {
+    margin-bottom: 10pt;
+  }
+
+  .letter-body {
+    margin-bottom: 15pt;
+  }
+
+  .letter-closing {
+    margin-top: 20pt;
+    text-align: right;
+  }
+
+  /* ========================================
+     OPTIMIZATION
+     ======================================== */
+
+  /* Reduce file size by hiding decorative elements */
+  [class*="shadow"],
+  [class*="gradient"],
+  [class*="blur"] {
+    box-shadow: none !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Force black text for better readability */
+  body, p, div, span, li {
+    color: #000 !important;
+  }
+
+  /* Ensure good contrast */
+  .text-muted-foreground {
+    color: #666 !important;
+  }
+
+  /* ========================================
+     DARK MODE OVERRIDE
+     ======================================== */
+
+  /* Force light theme for print */
+  [data-theme="dark"],
+  .dark {
+    background: white !important;
+    color: black !important;
+  }
+
+  .dark * {
+    background: transparent !important;
+    color: inherit !important;
+  }
+}
+
+/* ========================================
+   PRINT PREVIEW MODE (Screen simulation)
+   ======================================== */
+
+.print-preview {
+  background: #525659;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.print-preview-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 20px;
+  padding: 20mm;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  page-break-after: always;
+}
+
+.print-preview-toolbar {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}

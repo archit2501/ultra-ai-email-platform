@@ -1,0 +1,150 @@
+{
+  "recipient": {
+    "name": "Farida Berbache",
+    "email": "farida.berbache@heatsoftware.com",
+    "position": "HR",
+    "company": "https://www.linkedin.com/company/164785"
+  },
+  "company_intelligence": {
+    "company_name": "https://www.linkedin.com/company/164785",
+    "website": "https://heatsoftware.com",
+    "industry": "saas",
+    "size": "100+ employees",
+    "location": null,
+    "tech_stack": [],
+    "programming_languages": [],
+    "frameworks": [],
+    "cloud_platforms": [],
+    "databases": [],
+    "job_openings": [],
+    "hiring_for_roles": [],
+    "projects": [
+      {
+        "name": "Improve service quality through the cloud",
+        "description": "HEAT is dedicated to providing customers with proven cloud solutions that make their businesses more efficient, compliant, and secure.The company empowers IT, HR, Facilities, Customer Service, and other enterprise functions to simplify and automate their business processes to improve service quality",
+        "technologies": []
+      },
+      {
+        "name": "HEAT Solutions",
+        "description": "IT needs a firmer grasp on what’s happening in the user environment while securing critical assets and data. HEAT delivers on the promise of truly flexible, scalable, and secure service and endpoint management solutions that solve common business challenges.",
+        "technologies": []
+      },
+      {
+        "name": "We don’t trumpet our technology only to fall silent on support",
+        "description": "Our technical representatives stand ready to help you keep your end users productive and deliver information that provides easy-to-find answers to common questions.Log a support issue via self service, contact your local support team for personalized assistance, collaborate with experts, search know",
+        "technologies": []
+      },
+      {
+        "name": "Improve service quality",
+        "description": "By automating business processes",
+        "technologies": []
+      },
+      {
+        "name": "Improve service quality through the cloud",
+        "description": "HEAT is dedicated to providing customers with proven cloud solutions that make their businesses more efficient, compliant, and secure.The company empowers IT, HR, Facilities, Customer Service, and other enterprise functions to simplify and automate their business processes to improve service quality",
+        "technologies": []
+      },
+      {
+        "name": "HEAT Solutions",
+        "description": "IT needs a firmer grasp on what’s happening in the user environment while securing critical assets and data. HEAT delivers on the promise of truly flexible, scalable, and secure service and endpoint management solutions that solve common business challenges.",
+        "technologies": []
+      },
+      {
+        "name": "We don’t trumpet our technology only to fall silent on support",
+        "description": "Our technical representatives stand ready to help you keep your end users productive and deliver information that provides easy-to-find answers to common questions.Log a support issue via self service, contact your local support team for personalized assistance, collaborate with experts, search know",
+        "technologies": []
+      },
+      {
+        "name": "Improve service quality",
+        "description": "By automating business processes",
+        "technologies": []
+      }
+    ],
+    "company_values": [
+      "our mission, and underpinned by four foundational values. careers ready to help us innovate? learn more about becoming part of our team. equitable inclusion at ivanti we are committed to making ivanti"
+    ],
+    "company_culture": "HEAT Software was a leader in the unification of Cloud Service Management and Unified Endpoint Management until it merged with LANDESK in 2017 to form Ivanti.",
+    "recent_news": [],
+    "confidence_score": 45.0,
+    "data_sources": [
+      "company_website_9_pages"
+    ]
+  },
+  "email_drafts": [
+    {
+      "subject": "Software Engineering Opportunity at https://www.linkedin.com/company/164785",
+      "body": "Dear Mr./Ms. Berbache,\n\nI'm Pragya Pandey, currently an ASSOCIATE ML ENGINEER Aug 2024 - Current . I came across https://www.linkedin.com/company/164785 and was impressed by your work in saas.\n\nRecently achieved 99.93% accuracy in automated colon cancer prediction using deep learning.\n\nI'm particularly interested in https://www.linkedin.com/company/164785's approach to innovation. My background in AI/ML and hands-on experience with TensorFlow and PyTorch aligns well with your tech stack.\n\nWould you be open to a brief conversation about potential opportunities at https://www.linkedin.com/company/164785?\n\nBest regards,\nPragya Pandey",
+      "tone": "professional",
+      "personalization_score": 60.0,
+      "key_talking_points": [
+        "Experience at Clarivate Noida,UP",
+        "Notable project: ColNet: A Compact Convolutional Transformer for Co...",
+        "Interest in Improve service quality through the cloud"
+      ],
+      "matched_skills": [],
+      "estimated_response_rate": "20-30%"
+    },
+    {
+      "subject": "Excited About https://www.linkedin.com/company/164785's Mission!",
+      "body": "Dear Mr./Ms. Berbache,\n\nI'm reaching out because https://www.linkedin.com/company/164785's work in saas genuinely excites me!\n\nAs an ML Engineer at Clarivate working with LLMs and GenAI, I've been following your projects. What caught my attention: your use of innovative approaches.\n\nQuick highlight: I recently built ColNet, achieving 99.93% accuracy in colon cancer detection - published and presented at academic conferences.\n\nI'd love to explore how my experience in deep learning and production ML systems could contribute to https://www.linkedin.com/company/164785's vision.\n\nCan we connect for 15 minutes?\n\nLooking forward to hearing from you!\nPragya Pandey",
+      "tone": "enthusiastic",
+      "personalization_score": 60.0,
+      "key_talking_points": [
+        "Experience at Clarivate Noida,UP",
+        "Notable project: ColNet: A Compact Convolutional Transformer for Co...",
+        "Interest in Improve service quality through the cloud"
+      ],
+      "matched_skills": [],
+      "estimated_response_rate": "20-30%"
+    },
+    {
+      "subject": "How I Improved IMU Accuracy by 40% (DRDO Research)",
+      "body": "Dear Mr./Ms. Berbache,\n\nLast year at DRDO, I faced a challenge: 500+ Inertial Measurement Units with inconsistent accuracy.\n\nUsing deep learning, we improved calibration accuracy by 40% and reduced error rates by 35%. The breakthrough? Advanced algorithmic approaches combined with large-scale data processing.\n\nThis experience taught me the power of AI in solving real-world problems - which is why https://www.linkedin.com/company/164785's work resonates with me.\n\nCurrently at Clarivate building ML applications with AWS and LLMs, I'm exploring opportunities where I can apply similar problem-solving approaches.\n\nWould you be interested in discussing how this experience might benefit https://www.linkedin.com/company/164785?\n\nBest,\nPragya Pandey",
+      "tone": "story_driven",
+      "personalization_score": 45.0,
+      "key_talking_points": [
+        "Experience at Clarivate Noida,UP",
+        "Notable project: ColNet: A Compact Convolutional Transformer for Co...",
+        "Interest in Improve service quality through the cloud"
+      ],
+      "matched_skills": [],
+      "estimated_response_rate": "10-20%"
+    },
+    {
+      "subject": "AI/ML Engineer with Published Research",
+      "body": "Dear Mr./Ms. Berbache,\n\nThree things I can bring to https://www.linkedin.com/company/164785:\n\n1. **Proven ML Expertise**: 99.93% accuracy on cancer detection (10K+ images), published in SCOPUS-indexed journals\n2. **Production Experience**: Currently building ML apps at Clarivate using AWS, LLMs, and GenAI\n3. **Technical Alignment**: Python, TensorFlow, ML - direct match with your stack\n\nI've delivered 30% improvement in threat detection at Tech Mahindra and 40% accuracy gains at DRDO.\n\nhttps://www.linkedin.com/company/164785's focus on saas aligns perfectly with my experience.\n\n15-minute call to explore fit?\n\nRegards,\nPragya Pandey",
+      "tone": "value_first",
+      "personalization_score": 60.0,
+      "key_talking_points": [
+        "Experience at Clarivate Noida,UP",
+        "Notable project: ColNet: A Compact Convolutional Transformer for Co...",
+        "Interest in Improve service quality through the cloud"
+      ],
+      "matched_skills": [],
+      "estimated_response_rate": "20-30%"
+    },
+    {
+      "subject": "Thoughts on https://www.linkedin.com/company/164785's Tech Stack",
+      "body": "Dear Mr./Ms. Berbache,\n\nI noticed https://www.linkedin.com/company/164785 is using advanced technologies in your projects. Having worked extensively with TensorFlow, PyTorch, and production ML systems, I have some thoughts on optimization approaches.\n\nBackground: Currently ML Engineer at Clarivate, previously at DRDO (40% accuracy improvement) and Tech Mahindra (30% threat detection increase).\n\nSpecific interest: How https://www.linkedin.com/company/164785 approaches saas challenges - particularly around model deployment and scalability.\n\nWould you be open to a conversation? Happy to share insights from my experience building ColNet (99.93% accuracy, published research).\n\nLooking forward to connecting,\nPragya Pandey",
+      "tone": "consultant",
+      "personalization_score": 60.0,
+      "key_talking_points": [
+        "Experience at Clarivate Noida,UP",
+        "Notable project: ColNet: A Compact Convolutional Transformer for Co...",
+        "Interest in Improve service quality through the cloud"
+      ],
+      "matched_skills": [],
+      "estimated_response_rate": "20-30%"
+    }
+  ],
+  "country_guidance": {
+    "formality": "formal",
+    "language": "en",
+    "tips": [
+      "Use professional titles and surnames",
+      "Keep emails concise and structured",
+      "Multilingual context (French, German, English) - English is safe",
+      "Emphasize international experience"
+    ]
+  }
+}
