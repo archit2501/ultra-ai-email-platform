@@ -149,7 +149,7 @@ export function NotificationBell() {
           }
         }}
       >
-        <Bell className="h-5 w-5 text-slate-400" />
+        <Bell className="h-5 w-5 text-slate-300" />
         <AnimatePresence>
           {unreadCount > 0 && (
             <motion.div

@@ -11,7 +11,7 @@ from typing import List
 from app.tasks.scheduler import get_scheduler_status as get_status, scheduler
 
 
-router = APIRouter(prefix="/admin/scheduler", tags=["Admin - Scheduler"])
+router = APIRouter(tags=["Admin - Scheduler"])
 
 
 # ========================================

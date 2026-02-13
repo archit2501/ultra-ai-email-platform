@@ -30,7 +30,7 @@ from app.models.warmup_health import (
 )
 from app.services.warmup_health_tracker import WarmupHealthTracker
 
-router = APIRouter(prefix="/warmup-health", tags=["Warmup Health"])
+router = APIRouter(tags=["Warmup Health"])
 
 
 # ============== Schemas ==============

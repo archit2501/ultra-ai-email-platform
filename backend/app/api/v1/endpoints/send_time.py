@@ -33,7 +33,7 @@ from app.services.send_time_optimizer import (
 from app.tasks.scheduler import ScheduledEmailEngine
 
 
-router = APIRouter(prefix="/send-time", tags=["Send Time Optimization"])
+router = APIRouter(tags=["Send Time Optimization"])
 
 
 # ============== Pydantic Schemas ==============

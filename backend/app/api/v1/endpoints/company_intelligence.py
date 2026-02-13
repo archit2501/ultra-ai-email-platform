@@ -20,7 +20,7 @@ from app.models.company_intelligence import (
 from app.services.smart_company_research import SmartCompanyResearchService
 from app.services.email_drafter import PersonalizedEmailDrafter
 
-router = APIRouter(prefix="/company-intelligence", tags=["company-intelligence"])
+router = APIRouter(tags=["company-intelligence"])
 
 
 # ============= PYDANTIC SCHEMAS =============

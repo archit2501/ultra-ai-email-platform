@@ -198,7 +198,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
               variant="ghost"
               size="icon"
               onClick={onToggle}
-              className="text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all"
+              className="text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all"
             >
               <ChevronLeft
                 className={cn(
@@ -221,7 +221,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
                   "flex items-center gap-3 px-3 py-2 rounded-lg transition-all relative",
                   isActive
                     ? "bg-blue-600 text-white shadow-lg shadow-blue-600/50"
-                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 )}
               >
                 <item.icon className="h-5 w-5 flex-shrink-0" />
@@ -244,7 +244,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
           <Button
             variant="ghost"
             onClick={logout}
-            className="w-full justify-start text-slate-400 hover:text-white hover:bg-slate-800"
+            className="w-full justify-start text-slate-300 hover:text-white hover:bg-slate-800"
           >
             <LogOut className="h-5 w-5" />
             {!collapsed && <span className="ml-3">Logout</span>}

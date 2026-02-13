@@ -22,7 +22,7 @@ export function ThemeCustomizer() {
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" className="relative">
-        <Palette className="h-5 w-5" />
+        <Palette className="h-5 w-5 text-slate-300" />
       </Button>
     )
   }
@@ -36,7 +36,7 @@ export function ThemeCustomizer() {
           className="relative"
           aria-label="Customize theme"
         >
-          <Palette className="h-5 w-5" />
+          <Palette className="h-5 w-5 text-slate-300" />
           {currentPreset !== "default" && (
             <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary" />
           )}

@@ -14,7 +14,7 @@ from app.models import Candidate, RateLimitConfig, RATE_LIMIT_PRESETS
 from app.services.rate_limiting_service import RateLimitingService
 
 
-router = APIRouter(prefix="/rate-limits", tags=["Rate Limiting"])
+router = APIRouter(tags=["Rate Limiting"])
 
 
 # Pydantic schemas

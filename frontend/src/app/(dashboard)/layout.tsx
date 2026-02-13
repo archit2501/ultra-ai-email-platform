@@ -141,7 +141,7 @@ export default function DashboardLayout({
                         className="relative group p-2 rounded-lg hover:bg-slate-800/50 transition-all duration-200"
                         title={page.tooltip}
                       >
-                        <IconComponent className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                        <IconComponent className="w-4 h-4 text-slate-300 group-hover:text-cyan-400 transition-colors" />
                       </Link>
                     </motion.div>
                   );

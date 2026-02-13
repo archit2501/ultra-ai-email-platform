@@ -14,7 +14,7 @@ from app.models import Candidate, EmailWarmingConfig, WarmingStrategyEnum, WARMI
 from app.services.email_warming_service import EmailWarmingService
 
 
-router = APIRouter(prefix="/warming", tags=["Email Warming"])
+router = APIRouter(tags=["Email Warming"])
 
 
 # Pydantic schemas

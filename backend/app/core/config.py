@@ -82,8 +82,8 @@ For issues, visit: https://github.com/metamindswork-ux/COLD-EMAIL-WEB-APPLICATIO
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7     # Long-lived refresh tokens (7 days)
 
     # Redis (for caching, distributed rate limiting, and token blacklist)
-    REDIS_URL: str = "redis://localhost:6379/0"  # Redis connection URL
-    REDIS_ENABLED: bool = True  # Enable/disable Redis caching
+    REDIS_URL: str = ""  # Redis connection URL (empty = use in-memory for dev)
+    REDIS_ENABLED: bool = False  # Enable/disable Redis caching
     REDIS_CACHE_TTL_DEFAULT: int = 3600  # Default cache TTL in seconds (1 hour)
     REDIS_CACHE_TTL_SHORT: int = 300  # Short cache TTL (5 minutes)
     REDIS_CACHE_TTL_LONG: int = 86400  # Long cache TTL (24 hours)
