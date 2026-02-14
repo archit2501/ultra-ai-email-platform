@@ -97,7 +97,7 @@ class AsyncRecipientGroupRepository(AsyncBaseRepository[RecipientGroup]):
             .options(
                 selectinload(RecipientGroup.group_recipients)
                 .selectinload(GroupRecipient.recipient),
-                selectinload(RecipientGroup.campaigns).limit(10)
+                selectinload(RecipientGroup.campaigns)
             )
         )
 

@@ -55,6 +55,39 @@ from app.models.template_marketplace import (
     TemplateLanguage as MarketplaceTemplateLanguage,
 )
 
+# Company Intelligence (Skill Matching, Research, Email Drafts)
+from app.models.company_intelligence import (
+    CompanyProject,
+    CompanyResearchCache,
+    SkillMatch,
+    PersonalizedEmailDraft,
+    CandidateSkillProfile,
+)
+
+# Follow-Up Sequences & Campaigns
+from app.models.follow_up import (
+    FollowUpSequence,
+    FollowUpStep,
+    FollowUpCampaign,
+    FollowUpEmail,
+    FollowUpLog,
+    CandidateProfile,
+    ABTest,
+    ABTestVariant,
+    ABTestAssignment,
+)
+
+# Documents (Resume & Info Doc Management)
+from app.models.documents import ParsedResume, CompanyInfoDoc
+
+# Warmup Health Monitoring
+from app.models.warmup_health import (
+    WarmupHealthScore,
+    WarmupHealthAlert,
+    DomainReputation,
+    WarmupMilestone,
+)
+
 # Recipient Groups (NEW)
 from app.models.recipient import Recipient
 from app.models.recipient_group import RecipientGroup, GroupTypeEnum
@@ -167,6 +200,30 @@ __all__ = [
     "TemplateCollection",
     "TemplateVisibility",
     "MarketplaceTemplateLanguage",
+    # Company Intelligence
+    "CompanyProject",
+    "CompanyResearchCache",
+    "SkillMatch",
+    "PersonalizedEmailDraft",
+    "CandidateSkillProfile",
+    # Follow-Up Sequences & Campaigns
+    "FollowUpSequence",
+    "FollowUpStep",
+    "FollowUpCampaign",
+    "FollowUpEmail",
+    "FollowUpLog",
+    "CandidateProfile",
+    "ABTest",
+    "ABTestVariant",
+    "ABTestAssignment",
+    # Documents
+    "ParsedResume",
+    "CompanyInfoDoc",
+    # Warmup Health
+    "WarmupHealthScore",
+    "WarmupHealthAlert",
+    "DomainReputation",
+    "WarmupMilestone",
     # Recipient Groups (NEW)
     "Recipient",
     "RecipientGroup",

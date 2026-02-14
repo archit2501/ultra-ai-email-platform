@@ -234,9 +234,10 @@ async def create_group(
     group_dict = group_data.model_dump()
     group_dict["candidate_id"] = current_candidate.id
 
-    # Convert filter_criteria Pydantic model to dict if present
-    if group_dict.get("filter_criteria"):
-        group_dict["filter_criteria"] = group_dict["filter_criteria"].model_dump(exclude_none=True)
+    # filter_criteria is already a dict after model_dump(), no further conversion needed
+    # Remove None values from filter_criteria if present
+    if group_dict.get("filter_criteria") and isinstance(group_dict["filter_criteria"], dict):
+        group_dict["filter_criteria"] = {k: v for k, v in group_dict["filter_criteria"].items() if v is not None}
 
     group = await repo.create(group_dict)
 
@@ -307,9 +308,9 @@ async def update_group(
     # Update group
     update_dict = group_data.model_dump(exclude_unset=True)
 
-    # Convert filter_criteria Pydantic model to dict if present
-    if "filter_criteria" in update_dict and update_dict["filter_criteria"]:
-        update_dict["filter_criteria"] = update_dict["filter_criteria"].model_dump(exclude_none=True)
+    # filter_criteria is already a dict after model_dump(), no further conversion needed
+    if "filter_criteria" in update_dict and update_dict["filter_criteria"] and isinstance(update_dict["filter_criteria"], dict):
+        update_dict["filter_criteria"] = {k: v for k, v in update_dict["filter_criteria"].items() if v is not None}
 
     if not update_dict:
         # No fields to update
@@ -579,10 +580,14 @@ async def remove_recipients_from_group(
 
         logger.info(f"✅ [GROUPS] Removed {removed_count} recipients from group {group_id}")
 
+        # Refresh group to get accurate total after removal
+        updated_group = await repo.get_by_id(group_id, use_cache=False)
+        actual_total = updated_group.total_recipients if updated_group else max(0, (group.total_recipients or 0) - removed_count)
+
         return {
             "group_id": group_id,
             "removed_count": removed_count,
-            "total_recipients": max(0, (group.total_recipients or 0) - removed_count)
+            "total_recipients": actual_total
         }
 
     except ValueError as e:

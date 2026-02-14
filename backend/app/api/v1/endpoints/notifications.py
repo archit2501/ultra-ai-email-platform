@@ -85,15 +85,38 @@ class NotificationPreferenceResponse(BaseModel):
     enabled_types: dict
     delivery_preferences: dict
     quiet_hours_enabled: bool
-    quiet_start_time: Optional[str]
-    quiet_end_time: Optional[str]
+    quiet_start_time: Optional[str] = None
+    quiet_end_time: Optional[str] = None
     dnd_enabled: bool
-    dnd_until: Optional[str]
+    dnd_until: Optional[str] = None
     digest_enabled: bool
     digest_frequency: str
 
     class Config:
         from_attributes = True
+
+    @staticmethod
+    def _time_to_str(val):
+        """Convert time/datetime to string if needed."""
+        if val is None:
+            return None
+        if hasattr(val, "isoformat"):
+            return val.isoformat()
+        return str(val)
+
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        """Override model_validate to handle time objects from ORM."""
+        if hasattr(obj, "quiet_start_time") and not isinstance(obj, dict):
+            import datetime as dt
+            data = {}
+            for field_name in cls.model_fields:
+                val = getattr(obj, field_name, None)
+                if isinstance(val, (dt.time, dt.datetime)):
+                    val = val.isoformat()
+                data[field_name] = val
+            return super().model_validate(data, **kwargs)
+        return super().model_validate(obj, **kwargs)
 
 
 class UpdateNotificationPreferenceRequest(BaseModel):
@@ -281,6 +304,21 @@ def cleanup_expired(db: Session = Depends(get_db)):
 # ==================== NOTIFICATION PREFERENCES ====================
 
 
+
+def _serialize_preferences(prefs):
+    """Convert ORM preferences to dict with time->str conversion."""
+    import datetime as dt
+    data = {}
+    for field_name in NotificationPreferenceResponse.model_fields:
+        val = getattr(prefs, field_name, None)
+        if isinstance(val, (dt.time,)):
+            val = val.isoformat()
+        elif isinstance(val, (dt.datetime,)):
+            val = val.isoformat()
+        data[field_name] = val
+    return data
+
+
 @router.get("/preferences", response_model=NotificationPreferenceResponse)
 def get_notification_preferences(
     current_user=Depends(get_current_candidate),
@@ -300,7 +338,7 @@ def get_notification_preferences(
         db.commit()
         db.refresh(prefs)
 
-    return prefs
+    return _serialize_preferences(prefs)
 
 
 @router.put("/preferences", response_model=NotificationPreferenceResponse)
@@ -365,4 +403,4 @@ def update_notification_preferences(
     db.commit()
     db.refresh(prefs)
 
-    return prefs
+    return _serialize_preferences(prefs)

@@ -11,7 +11,7 @@ Specialized async repository for GroupCampaign model with:
 
 from typing import List, Optional, Dict, Any, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, or_
+from sqlalchemy import select, func, and_, or_, literal, Float
 from sqlalchemy.orm import selectinload, Session
 from datetime import datetime
 import logging
@@ -361,9 +361,9 @@ class AsyncGroupCampaignRepository(AsyncBaseRepository[GroupCampaign]):
         # Average success rate
         avg_success_stmt = select(
             func.avg(
-                func.cast(GroupCampaign.sent_count, float)
+                func.cast(GroupCampaign.sent_count, Float)
                 / func.nullif(GroupCampaign.total_recipients, 0)
-                * 100
+                * literal(100)
             )
         ).where(
             and_(
